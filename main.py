@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 wheel_radius_cm = 5.1/2
+radius_axle_cm = 2.500/2
 
 def main():
     data_frame = pd.read_csv('data/Lab13Export.csv', sep=',', header=0)
