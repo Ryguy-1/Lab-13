@@ -13,20 +13,6 @@ masses_pully = [50, 100, 150, 200, 250,
                 50, 100, 150, 200, 250,
                 50, 100, 150, 200, 250,]
 
-
-def main():
-    data_frame = pd.read_csv('data/Lab13Export.csv', sep=',', header=0)
-    generate_graph(1, 2, data_frame)
-
-def generate_graph(index_1, index_2, data_frame):
-    # Get Headers
-    headers = data_frame.columns.values
-    plt.plot(data_frame[headers[index_1]], data_frame[headers[index_2]], 'ro')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Dependent Variable')
-    plt.title('Plot of 1 vs 2')
-    plt.show()
-
 def plot_torque_vs_angular_acceleration():
     # Data Frame
     data_frame = pd.read_csv('data/Lab13Export.csv', sep=',', header=0)
