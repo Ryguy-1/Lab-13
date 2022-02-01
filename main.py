@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import linregress
 
 wheel_radius_cm = 5.1/2
 radius_axle_cm = 2.500/2
@@ -29,10 +30,8 @@ def generate_graph(index_1, index_2, data_frame):
 def plot_torque_vs_angular_acceleration():
     # Data Frame
     data_frame = pd.read_csv('data/Lab13Export.csv', sep=',', header=0)
-    # Calculate Angular Accelerations
-    angular_acceleration_lists = get_angular_accelerations(data_frame)
     # Average Angular Accelerations
-    averaged_angular_acceleration_values = get_averaged_angular_acceleration_values(angular_acceleration_lists)
+    averaged_angular_acceleration_values = get_averaged_angular_acceleration_values(data_frame)
     # Calculate Mass Accelerations
     mass_acceleration_lists = get_mass_accelerations(averaged_angular_acceleration_values)
     # Get Tension Forces
@@ -47,7 +46,9 @@ def plot_torque_vs_angular_acceleration():
         plt.xlabel('Angular Acceleration (rad/s^2)')
         plt.ylabel('Torque (Nm)')
         plt.title('Plot of Torque vs Angular Acceleration')
-        plt.show()
+        plt.savefig(f'data/experiment_{int(i/5+2)}_torque_vs_angular_acceleration.png')
+        # Delete pyplot
+        plt.clf()
 
 def get_torque_list(tension_forces):
     torque_list = []
@@ -74,20 +75,58 @@ def get_mass_accelerations(averaged_angular_acceleration_values):
     return accelerations_list
 
 # Average Angular Accelerations
-def get_averaged_angular_acceleration_values(angular_acceleration_lists):
-    averaged_angular_acceleration_values = []
-    for angular_acceleration_list in angular_acceleration_lists:
-        averaged_angular_acceleration_values.append(np.mean(angular_acceleration_list))
-    return averaged_angular_acceleration_values
+def get_averaged_angular_acceleration_values(data_frame):
 
-# Angular Accelerations in Order
-def get_angular_accelerations(data_frame):
-    angular_accelerations = []
-    for header in data_frame.columns.values:
-        if 'Angular Acceleration' in header:
-            angular_accelerations.append(data_frame[header])
-    # Ignore First Two Runs -> From Experiment 1
-    return angular_accelerations[2:]
+    # Get Slope of Datapoints
+    def get_slope(arr_x_y):
+        x = arr_x_y[0]
+        y = arr_x_y[1]
+        # Use Scipy to get slope
+        slope = linregress(x, y)[0]
+        print(slope)
+        return slope
+
+    # Get Position Data to take Slope of Line Through for Each Run
+    position_data_per_run = [] # Format: [[time_values, velocity_values], [time_values, velocity_values], ...]
+    headers = data_frame.columns.values
+    # Get Data Frame Indices with Time in them
+    time_indices = []
+    for i in range(len(headers)):
+        if 'Time (s)' in headers[i]:
+            time_indices.append(i)
+    # Get Data Frame Indices with Speed in them
+    velocity_indices = []
+    for i in range(len(headers)):
+        if "Angular Speed (rad/s)" in headers[i]:
+            velocity_indices.append(i)
+    # Populate Positions Data Per Run
+    for i in range(len(time_indices)):
+        position_data_per_run.append([data_frame[headers[time_indices[i]]].values, data_frame[headers[velocity_indices[i]]].values])
+
+    # Get Rid of Nan Values
+    new_position_data_per_run = []
+    for i in range(len(position_data_per_run)):
+        temp_list_x = []
+        temp_list_y = []
+        for j in range(1, len(position_data_per_run[i][1]), 3):
+            if not np.isnan(position_data_per_run[i][0][j]) and not np.isnan(position_data_per_run[i][1][j]):
+                temp_list_x.append(position_data_per_run[i][0][j])
+                temp_list_y.append(position_data_per_run[i][1][j])
+        new_position_data_per_run.append([temp_list_x, temp_list_y])
+    position_data_per_run = new_position_data_per_run
+
+    # Take Slope of Best Fit Line For Each Run and Append to Averaged Angular Acceleration List
+    averaged_angular_acceleration_values = []
+    for i in range(len(position_data_per_run)):
+        print(position_data_per_run[i])
+        # Get Slope of Best Fit Line
+        slope = get_slope(position_data_per_run[i])
+        # Append to Averaged Angular Acceleration List
+        averaged_angular_acceleration_values.append(slope)
+
+    # for angular_acceleration_list in angular_acceleration_lists:
+    #     averaged_angular_acceleration_values.append(np.mean(angular_acceleration_list))
+    return averaged_angular_acceleration_values[2:]
 
 
 if __name__ == '__main__':
