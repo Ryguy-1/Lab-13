@@ -38,7 +38,7 @@ def plot_torque_vs_angular_acceleration():
         y = slope * x + intercept
         plt.plot(x, y, 'b')
         # Print equation of line
-        print('y = ' + str(slope) + 'x + ' + str(intercept), 'r^2 = ' + str(r_value**2))
+        print('y = ' + str(round(slope, 3)) + 'x + ' + str(round(intercept, 3)), 'r^2 = ' + str(round(r_value**2, 3)))
         plt.xlabel('Angular Acceleration (rad/s^2)')
         plt.ylabel('Torque (Ncm)')
         plt.title('Torque vs Angular Acceleration (Linear)')
@@ -58,7 +58,7 @@ def plot_torque_vs_angular_acceleration():
         # Calculate r^2 value of polyfit
         r_value = np.corrcoef(xp, p(xp))[0,1]
         # Print equation of line
-        print('y = ' + str(coeffs[0]) + 'x^2 + ' + str(coeffs[1]) + 'x + ' + str(coeffs[2]), 'r^2 = ' + str(r_value**2))
+        print('y = ' + str(round(coeffs[0], 3)) + 'x^2 + ' + str(round(coeffs[1], 3)) + 'x + ' + str(round(coeffs[2], 3)), 'r^2 = ' + str(round(r_value**2, 3)))
         plt.xlabel('Angular Acceleration (rad/s^2)')
         plt.ylabel('Torque (Ncm)')
         plt.title('Torque vs Angular Acceleration (Polynomial)')
