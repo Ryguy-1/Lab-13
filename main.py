@@ -50,16 +50,13 @@ def plot_torque_vs_angular_acceleration():
     for i in range(10, len(torque_list), 5):
         plt.plot(averaged_angular_acceleration_values[i:i+5], torque_list[i:i+5], 'ro')
         # Plot polynomial fit
-        # Get polynomial coefficients
+        # Get polynomial coefficients and calculate r^2 value for polynomial   
         coeffs = np.polyfit(averaged_angular_acceleration_values[i:i+5], torque_list[i:i+5], 2)
-        # Get polynomial function
-        poly = np.poly1d(coeffs)
-        # Get x values
-        x = np.linspace(min(averaged_angular_acceleration_values[i:i+5]), max(averaged_angular_acceleration_values[i:i+5]), 100)
-        # Get y values
-        y = poly(x)
-        # Plot polynomial
-        plt.plot(x, y, 'b')
+        p = np.poly1d(coeffs)
+        xp = np.linspace(min(averaged_angular_acceleration_values[i:i+5]), max(averaged_angular_acceleration_values[i:i+5]), 100)
+        plt.plot(xp, p(xp), 'b')
+        # Calculate r^2 value of polyfit
+        r_value = np.corrcoef(xp, p(xp))[0,1]
         # Print equation of line
         print('y = ' + str(coeffs[0]) + 'x^2 + ' + str(coeffs[1]) + 'x + ' + str(coeffs[2]), 'r^2 = ' + str(r_value**2))
         plt.xlabel('Angular Acceleration (rad/s^2)')
