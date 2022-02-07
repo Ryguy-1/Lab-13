@@ -88,7 +88,11 @@ def get_tension_forces(mass_acceleration_lists):
 def get_mass_accelerations(averaged_angular_acceleration_values):
     accelerations_list = []
     for acceleration in averaged_angular_acceleration_values:
-        accelerations_list.append(acceleration * wheel_radius_cm)
+        # Get Linear Acceleartion (String)
+        linear_acceleration = acceleration * wheel_radius_cm
+        # Convert Linear Acceleration to Angular Acceleration of Platform Axle (Platform Angular Acceleration)
+        accelerations_list.append(linear_acceleration/radius_axle_cm)
+    print(accelerations_list)
     return accelerations_list
 
 # Get Slope of Datapoints
@@ -140,7 +144,6 @@ def get_averaged_angular_acceleration_values(data_frame):
         slope = get_slope(position_data_per_run[i])
         # Append to Averaged Angular Acceleration List
         averaged_angular_acceleration_values.append(slope)
-    print(averaged_angular_acceleration_values[2:])
 
     # for angular_acceleration_list in angular_acceleration_lists:
     #     averaged_angular_acceleration_values.append(np.mean(angular_acceleration_list))
