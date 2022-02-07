@@ -18,12 +18,17 @@ masses_pully = [50, 100, 150, 200, 250,
 def plot_torque_vs_angular_acceleration():
     # Data Frame
     data_frame = pd.read_csv('data/Lab13Export.csv', sep=',', header=0)
-    # Average Angular Accelerations
+    # Average Angular Accelerations (FOR PULLEY)
     averaged_angular_acceleration_values = get_averaged_angular_acceleration_values(data_frame)
-    # Calculate Mass Accelerations
-    mass_acceleration_lists = get_mass_accelerations(averaged_angular_acceleration_values)
+    # Calculate Mass Accelerations (FOR STRING (LINEAR ACCELERATION))
+    linear_accelerations = get_mass_accelerations(averaged_angular_acceleration_values)
+    # Converted angular_accelerations to axel (to use at end)
+    angular_accelerations_axel = []
+    for linear_acceleration in linear_accelerations:
+                # Convert Linear Acceleration to Angular Acceleration of Platform Axle (Platform Angular Acceleration)
+        angular_accelerations_axel.append(linear_acceleration/radius_axle_cm)
     # Get Tension Forces
-    tension_forces = get_tension_forces(mass_acceleration_lists)
+    tension_forces = get_tension_forces(linear_accelerations)
     # Torque = Tension Force * Radius Axle
     torque_list = get_torque_list(tension_forces)
 
@@ -31,10 +36,10 @@ def plot_torque_vs_angular_acceleration():
     # Plot torque_list vs averaged_angular_acceleration_values
 
     for i in range(0, len(torque_list), 5):
-        plt.plot(averaged_angular_acceleration_values[i:i+5], torque_list[i:i+5], 'ro')
+        plt.plot(angular_accelerations_axel[i:i+5], torque_list[i:i+5], 'ro')
         # Plot Best Fit Line
-        slope, intercept, r_value, p_value, std_err = linregress(averaged_angular_acceleration_values[i:i+5], torque_list[i:i+5])
-        x = np.linspace(min(averaged_angular_acceleration_values[i:i+5]), max(averaged_angular_acceleration_values[i:i+5]), 100)
+        slope, intercept, r_value, p_value, std_err = linregress(angular_accelerations_axel[i:i+5], torque_list[i:i+5])
+        x = np.linspace(min(angular_accelerations_axel[i:i+5]), max(angular_accelerations_axel[i:i+5]), 100)
         y = slope * x + intercept
         plt.plot(x, y, 'b')
         # Print equation of line
@@ -48,12 +53,12 @@ def plot_torque_vs_angular_acceleration():
     
     # For last two graphs, plot same thing, but with second degree polynomial fit
     for i in range(10, len(torque_list), 5):
-        plt.plot(averaged_angular_acceleration_values[i:i+5], torque_list[i:i+5], 'ro')
+        plt.plot(angular_accelerations_axel[i:i+5], torque_list[i:i+5], 'ro')
         # Plot polynomial fit
         # Get polynomial coefficients and calculate r^2 value for polynomial   
-        coeffs = np.polyfit(averaged_angular_acceleration_values[i:i+5], torque_list[i:i+5], 2)
+        coeffs = np.polyfit(angular_accelerations_axel[i:i+5], torque_list[i:i+5], 2)
         p = np.poly1d(coeffs)
-        xp = np.linspace(min(averaged_angular_acceleration_values[i:i+5]), max(averaged_angular_acceleration_values[i:i+5]), 100)
+        xp = np.linspace(min(angular_accelerations_axel[i:i+5]), max(angular_accelerations_axel[i:i+5]), 100)
         plt.plot(xp, p(xp), 'b')
         # Calculate r^2 value of polyfit
         r_value = np.corrcoef(xp, p(xp))[0,1]
@@ -90,8 +95,7 @@ def get_mass_accelerations(averaged_angular_acceleration_values):
     for acceleration in averaged_angular_acceleration_values:
         # Get Linear Acceleartion (String)
         linear_acceleration = acceleration * wheel_radius_cm
-        # Convert Linear Acceleration to Angular Acceleration of Platform Axle (Platform Angular Acceleration)
-        accelerations_list.append(linear_acceleration/radius_axle_cm)
+        accelerations_list.append(linear_acceleration)
     print(accelerations_list)
     return accelerations_list
 
@@ -105,8 +109,6 @@ def get_slope(arr_x_y):
 
 # Average Angular Accelerations
 def get_averaged_angular_acceleration_values(data_frame):
-
-
 
     # Get Position Data to take Slope of Line Through for Each Run
     position_data_per_run = [] # Format: [[time_values, velocity_values], [time_values, velocity_values], ...]
