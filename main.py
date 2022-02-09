@@ -78,7 +78,6 @@ def get_torque_list(tension_forces):
     torque_list = []
     for tension_force in tension_forces:
         torque_list.append(tension_force * radius_axle_cm)
-    print(f"torque list: {torque_list}")
     return torque_list
 
     # Torque = rFsin(θ) (sin(θ) = 1)))
@@ -98,7 +97,6 @@ def get_mass_accelerations(averaged_angular_acceleration_values):
         # Get Linear Acceleartion (String)
         linear_acceleration = acceleration * wheel_radius_cm
         accelerations_list.append(linear_acceleration)
-    print(accelerations_list)
     return accelerations_list
 
 # Get Slope of Datapoints
