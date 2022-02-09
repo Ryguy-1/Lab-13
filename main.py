@@ -5,15 +5,16 @@ from scipy.stats import linregress
 # Import polyfit
 from scipy.optimize import curve_fit
 
-wheel_radius_cm = 5.1/2
-radius_axle_cm = 2.500/2
+wheel_radius_cm = 5.1/2 / 100
+radius_axle_cm = 2.500/2 / 100
 gravity = 9.81
+round_places = 8
 
 # Starting from index 2 (3rd run) (Ignoring Experiment 1)
-masses_pully = [50, 100, 150, 200, 250, 
-                50, 100, 150, 200, 250, 
-                50, 100, 150, 200, 250,
-                50, 100, 150, 200, 250,]
+masses_pully = [0.050, 0.100, 0.150, 0.200, 0.250, 
+                0.050, 0.100, 0.150, 0.200, 0.250, 
+                0.050, 0.100, 0.150, 0.200, 0.250,
+                0.050, 0.100, 0.150, 0.200, 0.250,]
 
 def plot_torque_vs_angular_acceleration():
     # Data Frame
@@ -43,9 +44,9 @@ def plot_torque_vs_angular_acceleration():
         y = slope * x + intercept
         plt.plot(x, y, 'b')
         # Print equation of line
-        print('y = ' + str(round(slope, 3)) + 'x + ' + str(round(intercept, 3)), 'r^2 = ' + str(round(r_value**2, 3)))
+        print('y = ' + str(round(slope, round_places)) + 'x + ' + str(round(intercept, round_places)), 'r^2 = ' + str(round(r_value**2, round_places)))
         plt.xlabel('Angular Acceleration (rad/s^2)')
-        plt.ylabel('Torque (Ncm)')
+        plt.ylabel('Torque (N m)')
         plt.title('Torque vs Angular Acceleration (Linear)')
         plt.savefig(f'data/experiment_{int(i/5+2)}_torque_vs_angular_acceleration_linear.png')
         # Delete pyplot
@@ -63,9 +64,9 @@ def plot_torque_vs_angular_acceleration():
         # Calculate r^2 value of polyfit
         r_value = np.corrcoef(xp, p(xp))[0,1]
         # Print equation of line
-        print('y = ' + str(round(coeffs[0], 3)) + 'x^2 + ' + str(round(coeffs[1], 3)) + 'x + ' + str(round(coeffs[2], 3)), 'r^2 = ' + str(round(r_value**2, 3)))
+        print('y = ' + str(round(coeffs[0], round_places)) + 'x^2 + ' + str(round(coeffs[1], round_places)) + 'x + ' + str(round(coeffs[2], round_places)), 'r^2 = ' + str(round(r_value**2, round_places)))
         plt.xlabel('Angular Acceleration (rad/s^2)')
-        plt.ylabel('Torque (Ncm)')
+        plt.ylabel('Torque (N m)')
         plt.title('Torque vs Angular Acceleration (Polynomial)')
         plt.savefig(f'data/experiment_{int(i/5+2)}_torque_vs_angular_acceleration_polynomial.png')
         # Delete pyplot
@@ -77,6 +78,7 @@ def get_torque_list(tension_forces):
     torque_list = []
     for tension_force in tension_forces:
         torque_list.append(tension_force * radius_axle_cm)
+    print(f"torque list: {torque_list}")
     return torque_list
 
     # Torque = rFsin(θ) (sin(θ) = 1)))
